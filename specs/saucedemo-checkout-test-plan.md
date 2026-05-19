@@ -1,3 +1,131 @@
+# Test Plan: SCRUM-101 - SauceDemo Checkout
+
+## Overview
+This plan covers the end-to-end checkout workflow for https://www.saucedemo.com using the `standard_user` / `secret_sauce` credentials. It maps directly to the acceptance criteria in the user story and includes happy paths, negative cases, edge conditions, navigation checks, and responsiveness/cross-browser requirements.
+
+## Test Environment
+- Browsers: Chromium (Chrome), Firefox, WebKit (Safari)
+- Viewports: Desktop (1280x800), Mobile (375x812)
+- Credentials: Username: `standard_user`, Password: `secret_sauce`
+
+## Test Case Template
+- Title
+- Preconditions
+- Steps
+- Expected Results
+- Test Data
+
+---
+
+### TC-01: Happy Path — Complete Checkout
+Preconditions: Logged in as `standard_user`; cart contains at least one item.
+Steps:
+1. Navigate to products page; add a product to cart
+2. Open cart and verify item present
+3. Click `Checkout`
+4. Fill First Name, Last Name, Zip with valid values
+5. Click `Continue` to reach Overview
+6. Click `Finish`
+Expected Results:
+- Items shown in cart with name, description, price, and quantity
+- Checkout information accepts valid inputs and proceeds
+- Overview shows items, payment/shipping summary, subtotal, tax, total
+- After Finish, confirmation page shown with success message and `Back Home` button
+- Cart is cleared after confirmation
+Test Data: First Name: `John`, Last Name: `Doe`, Zip: `90210`
+
+### TC-02: Cart Review Details
+Preconditions: Logged in; multiple items added to cart.
+Steps:
+1. Open cart page
+2. Verify each listed item displays name, description, price, and quantity
+3. Verify total price calculation equals sum(items) + tax
+4. Click `Continue Shopping` and verify navigation back to products
+Expected Results:
+- All item details present and totals correct
+- `Continue Shopping` returns to products page
+
+### TC-03: Mandatory Field Validation (Empty Fields)
+Preconditions: On Checkout Information page with items in cart.
+Steps:
+1. Leave First Name empty, fill other fields, click `Continue`
+2. Repeat for Last Name and Zip fields individually
+Expected Results:
+- Appropriate validation message displayed identifying the empty required field
+- Cannot proceed to Overview until field is filled
+Test Data: omit fields per step
+
+### TC-04: Invalid Data Validation
+Preconditions: On Checkout Information page.
+Steps:
+1. Enter invalid values (e.g., `!@#$%` in First/Last, alphanumeric in Zip if Zip expects digits), click `Continue`
+Expected Results:
+- Proper validation messages displayed for invalid formats
+- Cannot proceed until inputs are valid
+Test Data: First Name: `!@#`, Last Name: `123`, Zip: `A1B2`
+
+### TC-05: Order Overview Accuracy
+Preconditions: Valid checkout information provided.
+Steps:
+1. Proceed to Overview
+2. Verify list of items matches cart with quantities
+3. Verify displayed payment and shipping info summary
+4. Verify subtotal, tax, and total calculations are correct
+5. Click `Cancel` and verify navigation back to cart with data intact
+Expected Results:
+- Overview displays accurate order summary and pricing calculations
+- Cancel returns to cart state preserving items
+
+### TC-06: Finish and Back Home Behavior
+Preconditions: On Overview page.
+Steps:
+1. Click `Finish`
+2. Verify confirmation page message content and presence of `Back Home`
+3. Click `Back Home` and verify navigation to products and that cart is empty
+Expected Results:
+- Confirmation page shown with success message
+- Back Home returns to products and cart cleared
+
+### TC-07: Cancel at Various Steps
+Preconditions: Items in cart; on Checkout Info or Overview pages.
+Steps:
+1. From Checkout Info, click `Cancel` and verify return to cart
+2. From Overview, click `Cancel` and verify return to cart
+Expected Results:
+- Cancel returns to cart page without completing order
+
+### TC-08: Navigation & Back Button Behavior
+Preconditions: Mid-checkout (Info or Overview page).
+Steps:
+1. Use browser Back button at each step and verify correct navigation and state
+Expected Results:
+- App handles browser back without exposing invalid states; form data may persist per expected behavior
+
+### TC-09: Mobile Responsiveness
+Preconditions: Use mobile viewport (375x812).
+Steps:
+1. Execute TC-01 and TC-03 on mobile viewport
+Expected Results:
+- Layout remains usable; form controls reachable; no visual overflow; validations still work
+
+### TC-10: Cross-Browser Smoke
+Preconditions: Run critical tests in Chromium, Firefox, WebKit.
+Steps:
+1. Execute TC-01 and TC-05 across each browser
+Expected Results:
+- Core flows work consistently across browsers; no selector-specific failures
+
+---
+
+## Reporting & Artifacts
+- Save exploratory screenshots for failing steps and key confirmations under `test-results/screenshots/`
+- Record manual execution notes and any defects into `test-results/SCRUM-101-checkout-test-report.md`
+
+## Notes for Automation
+- Prefer stable selectors: data-test, id, role attributes when available
+- Add `beforeEach` hook to log in and seed cart where needed
+- Use explicit waits for navigation and element visibility
+- Parameterize browsers and viewports in Playwright config
 **Test Plan Title:** Saucedemo — Checkout End-to-End Test Plan
 
 **Related User Story:** [user-stories/SCRUM-101-ecommerce-checkout.md](user-stories/SCRUM-101-ecommerce-checkout.md)  

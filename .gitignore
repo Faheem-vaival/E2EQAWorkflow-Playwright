@@ -2,6 +2,8 @@
 # Playwright
 node_modules/
 /test-results/
+!/test-results/
+!/test-results/SCRUM-101-checkout-test-report.md
 /playwright-report/
 /blob-report/
 /playwright/.cache/
